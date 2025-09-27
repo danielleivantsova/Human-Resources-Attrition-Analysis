@@ -1,5 +1,8 @@
 **Human Resources Attrition Analysis**
 
+Dataset  
+https://www.kaggle.com/datasets/mahmoudemadabdallah/hr-analytics-employee-attrition-and-performance?select=Employee.csv
+
 **Project Overview**  
 This project explores employee attrition using SQL, Excel, and Tableau. The dataset contains HR records for 1,470 employees.  
 Through SQL queries and an interactive Tableau dashboard, I identified key trends in workforce turnover, built KPI-driven insights, and provided actionable recommendations for HR decision-making.
