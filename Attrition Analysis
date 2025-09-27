@@ -1,0 +1,132 @@
+--List of employees who left the company
+SELECT employee_id, first_name, last_name, department, years_at_company
+FROM employee
+WHERE attrition = 'Yes'
+ORDER BY years_at_company DESC
+
+-- Average salary of employees grouped by department
+SELECT ROUND(AVG(salary)) AS avg_salary, department
+FROM employee
+GROUP BY department
+ORDER BY avg_salary DESC
+
+--Count the # of employees by marital status
+SELECT marital_status, COUNT(*)
+FROM employee
+GROUP BY marital_status
+
+--Show the top 10 employees with the longest tenure
+SELECT employee_id, first_name, last_name, years_at_company
+FROM employee
+ORDER BY years_at_company DESC
+LIMIT 10;
+
+-- List employees who work overtime and earn more than the average salary
+SELECT employee_id, first_name, last_name, salary
+FROM employee
+WHERE over_time = 'Yes' AND salary > (SELECT AVG(salary) FROM employee)
+GROUP BY employee_id
+ORDER BY salary DESC
+
+--Calculate the attrition rate per department
+SELECT department,
+    ROUND(COUNT(CASE 
+        WHEN attrition = 'Yes' THEN 1 END)::numeric/COUNT(*)*100, 2) AS attrition_rate
+FROM employee
+GROUP BY department
+ORDER BY attrition_rate DESC
+
+--Show the avg. performance rating per department
+SELECT e.department, ROUND(AVG(p.manager_rating),2) AS avg_manager_rating, ROUND(AVG(p.self_rating),2) AS avg_self_rating
+FROM employee AS e
+INNER JOIN performance_rating AS p
+    ON p.employee_id = e.employee_id
+GROUP BY e.department
+ORDER BY avg_manager_rating DESC, avg_self_rating DESC
+
+--Find the departments with the highest number of training opportunities taken
+SELECT e.department, SUM(p.training_opportunities_taken) AS total_trainings
+FROM employee AS e
+INNER JOIN performance_rating AS p
+    ON e.employee_id = p.employee_id
+GROUP BY e.department
+ORDER BY total_trainings DESC
+
+-- Compare self-ratings vs manager ratings for each employee
+SELECT e.department, 
+    p.manager_rating, 
+    p.self_rating,
+    COUNT(*) AS num_employees
+FROM employee AS e
+INNER JOIN performance_rating AS p
+    ON e.employee_id = p.employee_id
+GROUP BY e.department, p.manager_rating, p.self_rating
+
+
+--Rank employees within each department by salary
+SELECT 
+    first_name,
+    department, 
+    salary,
+    RANK() OVER (PARTITION BY department ORDER BY salary DESC) AS dept_salary_rank
+FROM employee
+ORDER BY department, dept_salary_rank
+
+-- Compute the attrition rate by age group
+WITH age_group AS (
+    SELECT
+    CASE
+        WHEN age BETWEEN 18 AND 23 THEN '18-23'
+        WHEN age BETWEEN 24 AND 29 THEN '24-29'
+        WHEN age BETWEEN 30 AND 35 THEN '30-35'
+        WHEN age BETWEEN 36 AND 41 THEN '36-41'
+        WHEN age BETWEEN 42 AND 47 THEN '42-47'
+        WHEN age BETWEEN 48 AND 53 THEN '48-53'
+        WHEN age >= 54 THEN '54+'
+    END AS ages,
+    ROUND(COUNT(CASE WHEN attrition = 'Yes' THEN 1 END)::numeric/COUNT(*)*100,2) AS attrition_rate
+    FROM employee
+    GROUP BY ages
+)
+SELECT *
+FROM age_group
+ORDER BY attrition_rate DESC
+
+--Identify the top 5 job roles with the highest attrition rate
+WITH top_attrition_jobs AS (
+    SELECT job_role, ROUND(COUNT(CASE WHEN attrition = 'Yes' THEN 1 END)::numeric/COUNT(*)*100,2) AS attrition_rate    FROM employee
+    GROUP BY job_role
+    ORDER BY attrition_rate DESC
+)
+SELECT *
+FROM top_attrition_jobs
+
+--Do employees with higher job satisfaction have lower attrition?
+SELECT ROUND(COUNT(CASE WHEN e.attrition = 'Yes' THEN 1 END)::numeric/COUNT(*)*100,2) AS attrition_rate,
+    p.job_satisfaction
+FROM employee AS e 
+INNER JOIN performance_rating AS p
+    ON e.employee_id = p.employee_id
+GROUP BY p.job_satisfaction
+ORDER BY p.job_satisfaction DESC
+
+--Is overtime associate with higher attrition rates?
+SELECT ROUND(COUNT(CASE WHEN attrition = 'Yes' THEN 1 END)::numeric/COUNT(*)*100,2) AS attrition_rate,
+    over_time
+FROM employee
+GROUP BY over_time
+ORDER BY attrition_rate DESC
+
+--Compare the avg years at the company for employees with stock options vs without
+SELECT ROUND(AVG(years_at_company),2) AS avg_years_at_company, stock_option_level
+FROM employee
+GROUP BY stock_option_level
+ORDER BY stock_option_level DESC
+
+--Find the relationship between training opportunities taken and manager ratings
+SELECT training_opportunities_taken,
+    ROUND(AVG(manager_rating),2) AS avg_manager_rating
+FROM performance_rating
+GROUP BY training_opportunities_taken
+ORDER BY training_opportunities_taken DESC;
+
