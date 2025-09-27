@@ -1,0 +1,76 @@
+CREATE TABLE performance_rating(
+    performance_id TEXT,
+    employee_id VARCHAR(255),
+    review_date DATE,
+    environment_satisfaction INT,
+    job_satisfaction INT,
+    relationship_satisfaction INT,
+    training_opportunities_within_year INT,
+    training_opportunities_taken INT,
+    work_life_balance INT,
+    self_rating INT,
+    manager_rating INT
+);
+
+CREATE TABLE employee(
+    employee_id VARCHAR(255) PRIMARY KEY,
+    first_name VARCHAR(255),
+    last_name VARCHAR(255),
+    gender VARCHAR(255),
+    age INT,
+    business_travel VARCHAR(255),
+    department VARCHAR(255),
+    distance_from_home INT,
+    employee_state TEXT,
+    ethnicity TEXT,
+    education VARCHAR(255),
+    education_field VARCHAR(255),
+    job_role VARCHAR(255),
+    marital_status VARCHAR(255),
+    salary REAL,
+    stock_option_level REAL,
+    over_time TEXT,
+    hire_date DATE,
+    attrition TEXT,
+    years_at_company INT,
+    years_in_most_recent_role INT,
+    years_since_last_promotion INT,
+    years_with_current_manager INT
+);
+
+CREATE TABLE satisfied(
+    satisfaction_id INT,
+    satisfaction_level VARCHAR(255)
+);
+
+CREATE TABLE rating(
+    rating_id INT,
+    rating_level VARCHAR(255)
+);
+
+COPY performance_rating
+FROM '/Users/centauress/Desktop/HR_Performance/PerformanceRating.csv'
+WITH (FORMAT csv, HEADER true, DELIMITER ',', ENCODING 'UTF8');
+
+COPY employee
+FROM '/Users/centauress/Desktop/HR_Performance/Employee.csv'
+WITH (FORMAT csv, HEADER true, DELIMITER ',', ENCODING 'UTF8');
+
+COPY satisfied
+FROM '/Users/centauress/Desktop/HR_Performance/SatisfiedLevel.csv'
+WITH (FORMAT csv, HEADER true, DELIMITER ',', ENCODING 'UTF8');
+
+COPY rating
+FROM '/Users/centauress/Desktop/HR_Performance/RatingLevel.csv'
+WITH (FORMAT csv, HEADER true, DELIMITER ',', ENCODING 'UTF8');
+
+
+-- Import into PG Admin
+\copy performance_rating FROM '/Users/centauress/Desktop/HR_Performance/PerformanceRating.csv' WITH (FORMAT csv, HEADER true, DELIMITER ',', ENCODING 'UTF8');
+
+\copy employee FROM '/Users/centauress/Desktop/HR_Performance/Employee.csv' WITH (FORMAT csv, HEADER true, DELIMITER ',', ENCODING 'UTF8');
+
+\copy satisfied FROM '/Users/centauress/Desktop/HR_Performance/SatisfiedLevel.csv' WITH (FORMAT csv, HEADER true, DELIMITER ',', ENCODING 'UTF8');
+
+\copy rating FROM '/Users/centauress/Desktop/HR_Performance/RatingLevel.csv' WITH (FORMAT csv, HEADER true, DELIMITER ',', ENCODING 'UTF8');
+
